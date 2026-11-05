@@ -77,7 +77,7 @@ ul, ol { padding: 0; list-style: none; }
 .x::after { transform: rotate(-45deg); }
 
 /* 最初の画面 */
-.hero { background: var(--ground); padding-top: clamp(28px, 3.8vw, 55px); overflow-x: clip; }
+.hero { background: var(--ground); padding-top: clamp(14px, 1.2vw, 17px); overflow-x: clip; }
 .hero-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 56px; align-items: end; padding-bottom: clamp(20px, 2vw, 29px); }
 .hero h1 { font-size: clamp(30px, 3.9vw, 56px); line-height: 1.42; font-weight: 700; letter-spacing: .04em; color: var(--ink); }
 .hero h1 span { display: block; white-space: nowrap; }
