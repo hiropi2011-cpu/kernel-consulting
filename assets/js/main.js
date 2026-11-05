@@ -1,7 +1,11 @@
-// カーネルコンサルティング HP試作：メニューの開閉・先頭へ戻るボタン・スクロールで現れる動き
+// カーネルコンサルティング HP試作：メニューの開閉・ヘッダー・先頭へ戻るボタン・画面に入ったときの動き
 (function () {
+	var header = document.getElementById('siteHeader');
 	var btn = document.getElementById('menuBtn');
 	var menu = document.getElementById('mobileMenu');
+	var toTop = document.getElementById('toTop');
+	var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 	function setMenu(open) {
 		menu.hidden = !open;
 		btn.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -15,17 +19,80 @@
 		window.addEventListener('resize', function () { if (window.innerWidth > 980 && !menu.hidden) setMenu(false); });
 	}
 
-	var toTop = document.getElementById('toTop');
-	if (toTop) {
-		var onScroll = function () { toTop.classList.toggle('show', window.scrollY > 600); };
-		window.addEventListener('scroll', onScroll, { passive: true });
-		onScroll();
+	function onScroll() {
+		var y = window.scrollY || document.documentElement.scrollTop;
+		if (header) header.classList.toggle('scrolled', y > 40);
+		if (toTop) toTop.classList.toggle('show', y > 600);
+	}
+	window.addEventListener('scroll', onScroll, { passive: true });
+	onScroll();
+
+	// 最初の画面：文字が左右から順に入る（最初の1回だけ）
+	var hero = document.getElementById('hero');
+	if (hero) {
+		if (reduce) hero.classList.add('ready');
+		else window.setTimeout(function () { hero.classList.add('ready'); }, 250);
 	}
 
-	var items = document.querySelectorAll('.reveal');
-	if (!('IntersectionObserver' in window)) { items.forEach(function (el) { el.classList.add('in'); }); return; }
+	if (reduce) return;
+
+	// 画面に入ったら動いて出てくるもの： [選ぶ相手, 付ける動き, 1つずつずらす秒数, 最初の待ち秒数]
+	var plan = [
+		['.sec h2, .cta h2, .page-head h1', 'reveal from-l', 0, 0.05],
+		['.page-lead, .sec-lead', 'reveal', 0, 0.25],
+		['.about-text p:not(.eyebrow), .svc-text > p:not(.eyebrow), .philosophy p:not(.eyebrow), .outline-grid > div > p:not(.eyebrow), .producer-grid > div > p:not(.eyebrow), .cta-grid > div > p:not(.eyebrow), #access p:not(.eyebrow)', 'reveal', 0.12, 0.2],
+		['.entry-list li', 'reveal zoom', 0.13, 0.1],
+		['.biz-list li', 'reveal zoom', 0.15, 0],
+		['.biz-img', 'wipe', 0.15, 0.1],
+		['.about-photo, .svc-photo, .map', 'wipe', 0, 0.1],
+		['.pair:first-child', 'reveal from-l', 0, 0],
+		['.pair:last-child', 'reveal from-r', 0, 0.2],
+		['.field-list li', 'reveal zoom', 0.1, 0.35],
+		['.mini-table > div, .co-table > div', 'reveal', 0.08, 0.1],
+		['.want', 'reveal zoom', 0, 0.35],
+		['.page-anchors li', 'reveal zoom', 0.1, 0.4],
+		['.cta .btn, .outline .btn', 'reveal from-r', 0, 0.35],
+		['.form .field, .form .consent, .form .btn', 'reveal', 0.07, 0.1]
+	];
+	var targets = [];
+	plan.forEach(function (row) {
+		var groups = new Map(); // 同じ親の中で順番にずらす
+		document.querySelectorAll(row[0]).forEach(function (el) {
+			if (el.dataset.fx) return;
+			el.dataset.fx = '1';
+			var n = groups.get(el.parentNode) || 0;
+			groups.set(el.parentNode, n + 1);
+			row[1].split(' ').forEach(function (c) { el.classList.add(c); });
+			el.style.setProperty('--d', (row[3] + n * row[2]).toFixed(2) + 's');
+			targets.push(el);
+		});
+	});
+	// 英字のラベルの線、違いの図
+	document.querySelectorAll('.eyebrow:not(.fx), .flow').forEach(function (el) { el.classList.add('watch'); targets.push(el); });
+	var i = 0;
+	document.querySelectorAll('.flow .flow-steps li').forEach(function (li) { li.style.setProperty('--i', i++); });
+
+	function show(el) {
+		if (el.dataset.shown) return;
+		el.dataset.shown = '1';
+		el.classList.add('in');
+		if (!el.dataset.fx) return;
+		// 動き終わったら動き用の指定を外す（ボタンやカードの、マウスを乗せたときの動きを邪魔しないため）
+		var d = parseFloat(el.style.getPropertyValue('--d')) || 0;
+		window.setTimeout(function () {
+			el.classList.remove('reveal', 'from-l', 'from-r', 'zoom', 'wipe', 'in');
+			el.style.removeProperty('--d');
+		}, (d + 2.4) * 1000);
+	}
+	if (!('IntersectionObserver' in window)) { targets.forEach(show); return; }
 	var io = new IntersectionObserver(function (entries) {
-		entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
-	}, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
-	items.forEach(function (el) { io.observe(el); });
+		entries.forEach(function (en) { if (en.isIntersecting) { show(en.target); io.unobserve(en.target); } });
+	}, { rootMargin: '0px 0px -4% 0px', threshold: 0 });
+	targets.forEach(function (el) { io.observe(el); });
+	// 念のため：ページのいちばん下まで来たら、まだ出ていないものを全部出す
+	function atBottom() {
+		if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) targets.forEach(show);
+	}
+	window.addEventListener('scroll', atBottom, { passive: true });
+	window.addEventListener('load', atBottom); // スクロールの要らない短いページ
 })();
