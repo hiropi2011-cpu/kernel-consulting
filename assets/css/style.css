@@ -243,11 +243,12 @@ ul, ol { padding: 0; list-style: none; }
 .form .btn.sending { opacity: .6; pointer-events: none; }
 
 /* スクロールで現れる動き（動きを減らす設定のときは出したまま） */
-.reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
-.reveal.in { opacity: 1; transform: none; }
+/* JSが動かないときは隠さない（.js は head の1行で付く） */
+.js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+.js .reveal.in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
 	html { scroll-behavior: auto; }
-	.reveal { opacity: 1; transform: none; transition: none; }
+	.js .reveal { opacity: 1; transform: none; transition: none; }
 	.biz-img img { transition: none; }
 }
 
@@ -306,4 +307,11 @@ ul, ol { padding: 0; list-style: none; }
 	.map iframe { height: 320px; }
 	.form .btn { width: 100%; min-width: 0; }
 	.choices .chk { width: 100%; }
+}
+
+/* 印刷のときは、スクロールで現れる動きを止めて全部出す */
+@media print {
+	.js .reveal { opacity: 1; transform: none; }
+	.site-header { position: static; }
+	.to-top, .proto-band { display: none; }
 }
