@@ -3,11 +3,13 @@
 	var header = document.getElementById('siteHeader');
 	var btn = document.getElementById('menuBtn');
 	var menu = document.getElementById('mobileMenu');
+	var shade = document.getElementById('menuShade');
 	var toTop = document.getElementById('toTop');
 	var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 	function setMenu(open) {
 		menu.hidden = !open;
+		if (shade) shade.hidden = !open;
 		btn.setAttribute('aria-expanded', open ? 'true' : 'false');
 		btn.setAttribute('aria-label', open ? 'メニューを閉じる' : 'メニューを開く');
 		document.body.style.overflow = open ? 'hidden' : '';
@@ -15,6 +17,7 @@
 	if (btn && menu) {
 		btn.addEventListener('click', function () { setMenu(menu.hidden); });
 		menu.addEventListener('click', function (e) { if (e.target.closest('a')) setMenu(false); });
+		if (shade) shade.addEventListener('click', function () { setMenu(false); });
 		document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hidden) { setMenu(false); btn.focus(); } });
 		window.addEventListener('resize', function () { if (window.innerWidth > 980 && !menu.hidden) setMenu(false); });
 	}

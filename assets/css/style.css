@@ -50,6 +50,8 @@ ul, ol { padding: 0; list-style: none; }
 .mobile-menu { position: fixed; inset: 0; top: 0; z-index: 40; background: var(--navy-deep); color: #fff; padding: calc(var(--hd) + 28px) 28px 40px; overflow: auto; }
 .mobile-menu a { display: block; text-decoration: none; font-size: 18px; font-weight: 500; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,.16); }
 .mobile-menu .mm-cta { margin-top: 28px; border: 1px solid #fff; text-align: center; font-weight: 700; }
+/* メニューの左に残る部分（うっすら暗くする。押すと閉じる） */
+.menu-shade { position: fixed; inset: 0; z-index: 39; background: rgba(9, 31, 49, .5); }
 
 /* 共通の部品 */
 .eyebrow { font-family: var(--en); font-weight: 600; font-size: 15px; letter-spacing: .18em; color: var(--green); line-height: 1.2; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
@@ -362,6 +364,30 @@ ul, ol { padding: 0; list-style: none; }
 	.choices .chk { width: 100%; }
 }
 
+/* スマホ・タブレットのメニュー：画面の右側 約3分の2 に出す（右からすっと入る） */
+@media (max-width: 980px) {
+	.mobile-menu { inset: 0 0 0 auto; width: clamp(248px, 68vw, 340px); padding: calc(var(--hd) + 18px) 24px 36px; box-shadow: -12px 0 32px rgba(0, 0, 0, .28); animation: mmIn .38s cubic-bezier(.2, .7, .2, 1); }
+	.mobile-menu a { font-size: 16px; padding: 16px 0; white-space: nowrap; }
+	.menu-shade { animation: shadeIn .3s ease; }
+	/* 右から入る部品が画面の外へはみ出して、ページが左右に揺れるのを防ぐ */
+	main, .site-footer { overflow-x: clip; }
+}
+@keyframes mmIn { from { transform: translateX(36px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes shadeIn { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .mobile-menu, .menu-shade { animation: none; } }
+
+/* スマホの動き：向きをそろえる。英字のラベルも見出しも、左から右へ1回だけ動いて収まる */
+@media (max-width: 700px) {
+	.js .fx.from-r { transform: translateX(-40px); }
+	.js .reveal.from-l, .js .reveal.from-r { transform: translateX(-28px); }
+	.js .eyebrow.watch { letter-spacing: .18em; transform: translateX(-28px); transition: opacity .8s ease, transform 1s cubic-bezier(.2, .7, .2, 1); }
+	.js .eyebrow.watch::before { width: 22px; transition: none; }
+	.js .eyebrow.watch.in { transform: none; }
+}
+@media (max-width: 700px) and (prefers-reduced-motion: reduce) {
+	.js .eyebrow.watch { transform: none; transition: none; }
+}
+
 /* 高輪の写真：幅が狭いときは背景にせず、区切りの下に横長の帯で見せる */
 @media (max-width: 980px) {
 	.sec.has-town { padding-bottom: 0; }
@@ -375,7 +401,7 @@ ul, ol { padding: 0; list-style: none; }
 	.js .reveal, .js .fx { opacity: 1; transform: none; }
 	.js .wipe > img, .js .wipe > iframe { clip-path: none; transform: none; }
 	.js .hero-photo { clip-path: none; }
-	.js .eyebrow.watch { opacity: 1; letter-spacing: .18em; }
+	.js .eyebrow.watch { opacity: 1; letter-spacing: .18em; transform: none; }
 	.js .flow.watch .flow-name, .js .flow.watch li span { opacity: 1; transform: none; }
 	.js .flow.watch li::before, .js .flow.watch li::after { transform: none; }
 	.site-header { position: static; }
