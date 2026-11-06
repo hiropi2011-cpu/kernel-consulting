@@ -92,12 +92,14 @@
 		window.setTimeout(function () {
 			el.classList.remove('reveal', 'from-l', 'from-r', 'zoom', 'wipe', 'in');
 			el.style.removeProperty('--d');
-		}, (d + 2.4) * 1000);
+		}, (d + 2.8) * 1000);
 	}
 	if (!('IntersectionObserver' in window)) { targets.forEach(show); return; }
+	// スマホは、画面の下から少し上がったところで動かす（指で送っている最中に、目の届く場所で動きが見えるように）
+	var narrow = window.matchMedia && window.matchMedia('(max-width: 700px)').matches;
 	var io = new IntersectionObserver(function (entries) {
 		entries.forEach(function (en) { if (en.isIntersecting) { show(en.target); io.unobserve(en.target); } });
-	}, { rootMargin: '0px 0px -4% 0px', threshold: 0 });
+	}, { rootMargin: narrow ? '0px 0px -12% 0px' : '0px 0px -4% 0px', threshold: 0 });
 	targets.forEach(function (el) { io.observe(el); });
 	// 念のため：ページのいちばん下まで来たら、まだ出ていないものを全部出す
 	function atBottom() {

@@ -311,8 +311,9 @@ ul, ol { padding: 0; list-style: none; }
 	.hero h1 { font-size: min(7.3vw, 50px); }
 	.js .fx.from-l { transform: translateX(-40px); }
 	.js .fx.from-r { transform: translateX(40px); }
-	.js .reveal.from-l { transform: translateX(-32px); }
-	.js .reveal.from-r { transform: translateX(32px); }
+	/* 「まだ出ていないとき」だけに限る。:not(.in) を外すと、出た後もずれた位置に残り、あとで1コマで飛ぶ */
+	.js .reveal.from-l:not(.in) { transform: translateX(-32px); }
+	.js .reveal.from-r:not(.in) { transform: translateX(32px); }
 	.about-text h2 { font-size: min(5.6vw, 34px); }
 	.entry-list { grid-template-columns: 1fr 1fr; }
 	.about-grid, .outline-grid, .producer-grid, .sec-head, .svc-grid { grid-template-columns: 1fr; gap: 32px; }
@@ -379,8 +380,10 @@ ul, ol { padding: 0; list-style: none; }
 /* スマホの動き：向きをそろえる。英字のラベルも見出しも、左から右へ1回だけ動いて収まる */
 @media (max-width: 700px) {
 	.js .fx.from-r { transform: translateX(-40px); }
-	.js .reveal.from-l, .js .reveal.from-r { transform: translateX(-28px); }
-	.js .eyebrow.watch { letter-spacing: .18em; transform: translateX(-28px); transition: opacity .8s ease, transform 1s cubic-bezier(.2, .7, .2, 1); }
+	.js .reveal.from-l:not(.in), .js .reveal.from-r:not(.in) { transform: translateX(-34px); }
+	/* ゆっくり動き出して、ゆっくり止まる（濃さと位置を同じ調子で変える） */
+	.js .reveal.from-l, .js .reveal.from-r { transition: opacity 1.3s cubic-bezier(.33, 0, .25, 1) var(--d, 0s), transform 1.5s cubic-bezier(.33, 0, .2, 1) var(--d, 0s); }
+	.js .eyebrow.watch { letter-spacing: .18em; transform: translateX(-34px); transition: opacity 1.3s cubic-bezier(.33, 0, .25, 1), transform 1.5s cubic-bezier(.33, 0, .2, 1); }
 	.js .eyebrow.watch::before { width: 22px; transition: none; }
 	.js .eyebrow.watch.in { transform: none; }
 }
