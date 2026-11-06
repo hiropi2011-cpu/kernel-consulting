@@ -45,6 +45,7 @@
 		['.biz-list li', 'reveal zoom', 0.15, 0],
 		['.biz-img', 'wipe', 0.15, 0.1],
 		['.about-photo, .svc-photo, .map', 'wipe', 0, 0.1],
+		['.town-bg', 'wipe', 0, 0.2],
 		['.pair:first-child', 'reveal from-l', 0, 0],
 		['.pair:last-child', 'reveal from-r', 0, 0.2],
 		['.field-list li', 'reveal zoom', 0.1, 0.35],
