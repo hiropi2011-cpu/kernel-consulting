@@ -34,7 +34,13 @@
 	var hero = document.getElementById('hero');
 	if (hero) {
 		if (reduce) hero.classList.add('ready');
-		else window.setTimeout(function () { hero.classList.add('ready'); }, 250);
+		else {
+			// 書体が読み込まれてから動かす（動きの途中で書体が切り替わると、文字の幅が変わってがたついて見える）。遅くても1.4秒で始める
+			var started = false;
+			var go = function () { if (started) return; started = true; window.setTimeout(function () { hero.classList.add('ready'); }, 150); };
+			if (document.fonts && document.fonts.ready) document.fonts.ready.then(go);
+			window.setTimeout(go, 1400);
+		}
 	}
 
 	if (reduce) return;
